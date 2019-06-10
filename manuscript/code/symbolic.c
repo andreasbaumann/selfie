@@ -3,10 +3,10 @@
    translates the code to an SMT-LIB formula that is satisfiable
    if and only if the code exits with a non-zero exit code. */
 
-uint64_t main() {
-  uint64_t* x;
+uint32_t main() {
+  uint32_t* x;
 
-  x = malloc(8);
+  x = malloc(4);
 
   read(1, x, 1);
 

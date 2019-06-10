@@ -1,5 +1,5 @@
 # Compiler flags
-CFLAGS := -Wall -Wextra -O3 -m64 -D'uint64_t=unsigned long long'
+CFLAGS := -Wall -Wextra -O3 -m32 -D'uint32_t=unsigned int'
 
 # Bootstrap selfie.c into selfie executable
 selfie: selfie.c
@@ -66,7 +66,7 @@ sat: selfie.m
 
 # Assemble RISC-U with GNU toolchain
 assemble: selfie.m selfie.s
-	riscv64-linux-gnu-as selfie.s -o a.out
+	riscv64-linux-gnu-as -march=rv32g selfie.s -o a.out
 	rm -rf a.out
 
 # Run selfie on spike
