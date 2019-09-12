@@ -8,13 +8,13 @@ This document provides an overview of the differences in semantics between the p
 
 ## Integer Literals
 
-Integer literals in C\* are interpreted as 64-bit unsigned integers. In C, however, integer literals are interpreted as 32-bit signed integers. As a result, an expression may evaluate to different values in C\* and C if the expression involves integer literals and operators with different semantics for signed and unsigned operands, that is, `/`, `%`, `<`, `<=`, `>`, and `>=`.
+Integer literals in C\* are interpreted as 32-/64-bit unsigned integers. In C, however, integer literals are interpreted as 32-bit signed integers. As a result, an expression may evaluate to different values in C\* and C if the expression involves integer literals and operators with different semantics for signed and unsigned operands, that is, `/`, `%`, `<`, `<=`, `>`, and `>=`.
 
 #### Arithmetic:
 
 ```
-uint64_t x;
-uint64_t y;
+uint_t x;
+uint_t y;
 
 x = 1 / -1;
 y = 1 % -1;
@@ -37,10 +37,10 @@ y == 0
 #### Comparison:
 
 ```
-uint64_t a;
-uint64_t b;
-uint64_t c;
-uint64_t d;
+uint_t a;
+uint_t b;
+uint_t c;
+uint_t d;
 
 a = 1 <  -1;
 b = 1 <= -1;
@@ -68,20 +68,26 @@ d == 1
 
 ## Strings
 
-Strings in C\* are arrays of type `uint64_t` whereas strings in C are arrays of type `char`. Thus each element of a string in C\* contains 8 characters rather than just 1 character as in C. Dereferencing a string therefore results in different values in C\* and C.
+Strings in C\* are arrays of type `uint_t` whereas strings in C are arrays of type `char`. Thus each element of a string in C\* contains 4 resp. 8 characters rather than just 1 character as in C. Dereferencing a string therefore results in different values in C\* and C.
 
 #### Dereferencing:
 
 ```
-uint64_t x;
+uint_t x;
 
 x = *"Hello World!";
 ```
 
-C\*:
+C\* on RISCV-64:
 
 ```
 x == 0x6F57206F6C6C6548
+```
+
+resp. on RISCV-32
+
+```
+x == 0x6C6C6548
 ```
 
 C:

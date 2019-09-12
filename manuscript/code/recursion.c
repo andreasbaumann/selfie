@@ -1,4 +1,4 @@
-uint64_t f(uint64_t x, uint64_t y) {
+uint_t f(uint_t x, uint_t y) {
   while (y > 0) {
     x = x + 1;
     y = y - 1;
@@ -7,13 +7,13 @@ uint64_t f(uint64_t x, uint64_t y) {
   return x;
 }
 
-uint64_t g(uint64_t x, uint64_t y) {
+uint_t g(uint_t x, uint_t y) {
   if (y > 0)
     return g(x, y - 1) + 1;
   else
     return x;
 }
 
-uint64_t main() {
+uint_t main() {
   return f(1,2) - g(1,2);
 }

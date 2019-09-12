@@ -1,8 +1,8 @@
 // global variable for pointing to the "Hello World!    " string
-uint64_t* foo;
+uint_t* foo;
 
 // main procedure for printing "Hello World!    " on the console
-uint64_t* main() {
+uint_t main() {
   // point to the "Hello World!    " string
   foo = "Hello World!    ";
 

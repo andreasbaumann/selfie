@@ -3,8 +3,8 @@
    translates the code to an SMT-LIB formula that is satisfiable
    if and only if the code exits with a non-zero exit code. */
 
-uint64_t main() {
-  uint64_t* x;
+uint_t main() {
+  uint_t* x;
 
   x = malloc(8);
 

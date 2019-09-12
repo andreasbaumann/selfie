@@ -2,19 +2,19 @@
 
 // libcstar procedures for printing
 void init_library();
-void print(uint64_t* s);
-void print_integer(uint64_t n);
-void print_binary(uint64_t n, uint64_t a);
+void print(uint_t* s);
+void print_integer(uint_t n);
+void print_binary(uint_t n, uint_t a);
 void println();
 
 // libcstar procedures for left and right shifting
-uint64_t left_shift(uint64_t n, uint64_t b);
-uint64_t right_shift(uint64_t n, uint64_t b);
+uint_t left_shift(uint_t n, uint_t b);
+uint_t right_shift(uint_t n, uint_t b);
 
-uint64_t main() {
-  uint64_t i;
-  uint64_t j;
-  uint64_t u;
+uint_t main() {
+  uint_t i;
+  uint_t j;
+  uint_t u;
 
   // initialize selfie's libcstar library
   init_library();

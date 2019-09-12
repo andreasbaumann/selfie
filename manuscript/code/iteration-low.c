@@ -1,7 +1,7 @@
-uint64_t x;       // this declares a globally visible variable called x
+uint_t x;         // this declares a globally visible variable called x
                   // that represents an unsigned 64-bit integer value
 
-uint64_t main() { // this declares a globally visible procedure called main that
+uint_t main() {   // this declares a globally visible procedure called main that
                   // has no inputs and returns an unsigned 64-bit integer value
 
   // here the value of x is undefined

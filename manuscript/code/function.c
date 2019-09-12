@@ -1,13 +1,13 @@
-uint64_t x;
+uint_t x;
 
-uint64_t f(uint64_t x) {
+uint_t f(uint_t x) {
   while (x > 0)
     x = x - 1;
 
   return x;
 }
 
-uint64_t main() {
+uint_t main() {
   x = 0;
 
   x = x + 1;

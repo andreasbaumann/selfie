@@ -1,5 +1,5 @@
-uint64_t main() {
-  uint64_t* x;
+uint_t main() {
+  uint_t* x;
 
   x = malloc(16);
 

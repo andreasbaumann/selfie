@@ -1,5 +1,20 @@
+# Compiler flags per architecture
+CFLAGS_RISCV64 := -m64 -D'uint_t=unsigned long long' -DARCHITECTURE=1 -DCPUBITWIDTH=64 -DREGISTERSIZE=8 -DSIZEOFUINT=8 -DSIZEOFUINTSTAR=8 -DWORDSIZE=4 -DWORDSIZEINBITS=32 -DINSTRUCTIONSIZE=4 -DALIGNBITS=3
+CFLAGS_RISCV32 := -m32 -D'uint_t=unsigned int' -DARCHITECTURE=2 -DCPUBITWIDTH=32 -DREGISTERSIZE=4 -DSIZEOFUINT=4 -DSIZEOFUINTSTAR=4 -DWORDSIZE=4 -DWORDSIZEINBITS=32 -DINSTRUCTIONSIZE=4 -DALIGNBITS=2 
+
 # Compiler flags
-CFLAGS := -Wall -Wextra -O3 -m64 -D'uint64_t=unsigned long long'
+#CFLAGS := -Wall -Wextra -O3
+CFLAGS := -O0 -g
+ifeq ($(ARCH),)
+  CFLAGS += $(CFLAGS_RISCV64)
+endif
+ifeq ($(ARCH),RISCV64)
+  CFLAGS += $(CFLAGS_RISCV64)
+endif
+ifeq ($(ARCH),RISCV32)
+  CFLAGS += $(CFLAGS_RISCV32)
+endif
+
 
 # Bootstrap selfie.c into selfie executable
 selfie: selfie.c
@@ -66,7 +81,7 @@ sat: selfie.m
 
 # Assemble RISC-U with GNU toolchain
 assemble: selfie.m selfie.s
-	riscv64-linux-gnu-as selfie.s -o a.out
+	riscvlinux-gnu-as selfie.s -o a.out
 	rm -rf a.out
 
 # Run selfie on spike
@@ -78,7 +93,7 @@ spike: selfie.m selfie.s
 # Run selfie on qemu usermode emulation
 qemu: selfie.m selfie.s
 	chmod +x selfie.m
-	qemu-riscv64-static selfie.m -c selfie.c -o selfie6.m -s selfie6.s -m 1
+	qemu-riscvstatic selfie.m -c selfie.c -o selfie6.m -s selfie6.s -m 1
 	diff -q selfie.m selfie6.m
 	diff -q selfie.s selfie6.s
 

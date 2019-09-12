@@ -1,5 +1,5 @@
-uint64_t main() {
-  uint64_t* string;
+uint_t main() {
+  uint_t* string;
 
   // the length of the string needs to be a multiple of 8
   string = "\nSelfie supports the escape sequences \\n \\t \\b \\\' \\\" \\\% \\\\    \n\n";
