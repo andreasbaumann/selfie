@@ -15,7 +15,7 @@ uint_t main() {
     // 1 means that we print to the console
     // foo points to a chunk of 8 characters
     // 8 means that we print 8 characters
-    write(1, foo, 8);
+    write(1, foo, REGISTERSIZE);
 
     // go to the next chunk of 8 characters
     foo = foo + 1;

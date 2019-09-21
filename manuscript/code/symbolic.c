@@ -6,7 +6,7 @@
 uint_t main() {
   uint_t* x;
 
-  x = malloc(8);
+  x = malloc(REGISTERSIZE);
 
   read(1, x, 1);
 
