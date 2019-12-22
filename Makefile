@@ -7,12 +7,15 @@ CFLAGS_RISCV32 := -m32 -D'uint_t=unsigned int' -DARCHITECTURE=2 -DCPUBITWIDTH=32
 CFLAGS := -O0 -g
 ifeq ($(ARCH),)
   CFLAGS += $(CFLAGS_RISCV64)
+  QEMU := qemu-riscstatic
 endif
 ifeq ($(ARCH),RISCV64)
   CFLAGS += $(CFLAGS_RISCV64)
+  QEMU := qemu-riscv64
 endif
 ifeq ($(ARCH),RISCV32)
   CFLAGS += $(CFLAGS_RISCV32)
+  QEMU := qemu-riscv32
 endif
 
 
@@ -93,7 +96,7 @@ spike: selfie.m selfie.s
 # Run selfie on qemu usermode emulation
 qemu: selfie.m selfie.s
 	chmod +x selfie.m
-	qemu-riscvstatic selfie.m -c selfie.c -o selfie6.m -s selfie6.s -m 1
+	$(QEMU) selfie.m -c selfie.c -o selfie6.m -s selfie6.s -m 1
 	diff -q selfie.m selfie6.m
 	diff -q selfie.s selfie6.s
 
