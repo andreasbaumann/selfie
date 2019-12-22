@@ -7547,7 +7547,8 @@ char* bv_constant(uint32_t value) {
 
   string = string_alloc(5 + 10 + 4); // 32-bit numbers require up to 10 decimal digits
 
-  sprintf1(string, "(_ bv%d 64)", (char*) value);
+  // TODO: what's this exactly?
+  sprintf1(string, "(_ bv%d 32)", (char*) value);
 
   return string;
 }
