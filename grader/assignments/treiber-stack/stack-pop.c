@@ -27,7 +27,7 @@ void print_integer(uint64_t i) {
   write(1, c, 2);
 }
 
-int main(int argc, char** argv) { 
+int main(int argc, char** argv) {
   uint64_t pid1;
   uint64_t pid2;
   uint64_t pid3;
@@ -45,12 +45,21 @@ int main(int argc, char** argv) {
 
   init_stack();
 
-  // 3^2 processes
+  push(allocate_id());
+  push(allocate_id());
+  push(allocate_id());
+  push(allocate_id());
+  push(allocate_id());
+  push(allocate_id());
+  push(allocate_id());
+  push(allocate_id());
+
+  // 2^3 processes
   pid1 = pthread_create();
   pid2 = pthread_create();
   pid3 = pthread_create();
 
-  push(allocate_id());
+  print_integer(pop());
 
   // do not wait for child-threads of the parent-process
   if (pid3 == 0)
@@ -64,18 +73,4 @@ int main(int argc, char** argv) {
     pthread_join(s);
   if (pid3)
     pthread_join(s);
-  
-  if (pid1 != 0)
-    if (pid2 != 0)
-      if (pid3 != 0) {
-        // main thread
-        print_integer(pop());
-        print_integer(pop());
-        print_integer(pop());
-        print_integer(pop());
-        print_integer(pop());
-        print_integer(pop());
-        print_integer(pop());
-        print_integer(pop());
-      }
 }
