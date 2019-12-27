@@ -7,17 +7,38 @@ CFLAGS_RISCV32 := -m32 -D'uint_t=unsigned int' -DARCHITECTURE=2 -DCPUBITWIDTH=32
 CFLAGS := -O0 -g
 ifeq ($(ARCH),)
   CFLAGS += $(CFLAGS_RISCV64)
-  QEMU := qemu-riscstatic
 endif
 ifeq ($(ARCH),RISCV64)
   CFLAGS += $(CFLAGS_RISCV64)
-  QEMU := qemu-riscv64
 endif
 ifeq ($(ARCH),RISCV32)
   CFLAGS += $(CFLAGS_RISCV32)
+endif
+
+# qemu
+ifeq ($(ARCH),)
+  QEMU := qemu-riscstatic
+endif
+ifeq ($(ARCH),RISCV64)
+  QEMU := qemu-riscv64
+endif
+ifeq ($(ARCH),RISCV32)
   QEMU := qemu-riscv32
 endif
 
+# spike
+ifeq ($(ARCH),)
+  SPIKE := spike
+  PK := pk
+endif
+ifeq ($(ARCH),RISCV64)
+  SPIKE := spike --isa=RV64IMAC
+  PK := pk-riscv64
+endif
+ifeq ($(ARCH),RISCV32)
+  SPIKE := spike --isa=RV32IMAC
+  PK := pk-riscv32
+endif
 
 # Bootstrap selfie.c into selfie executable
 selfie: selfie.c
@@ -108,7 +129,7 @@ assemble: selfie.m selfie.s
 
 # Run selfie on spike
 spike: selfie.m selfie.s
-	spike pk selfie.m -c selfie.c -o selfie5.m -s selfie5.s -m 1
+	$(SPIKE) $(PK) selfie.m -c selfie.c -o selfie5.m -s selfie5.s -m 1
 	diff -q selfie.m selfie5.m
 	diff -q selfie.s selfie5.s
 
