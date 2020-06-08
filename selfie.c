@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015-2019, the Selfie Project authors. All rights reserved.
+Copyright (c) 2015-2020, the Selfie Project authors. All rights reserved.
 Please see the AUTHORS file for details. Use of this source code is
 governed by a BSD license that can be found in the LICENSE file.
 
@@ -8756,24 +8756,24 @@ uint_t compare_call_stacks(uint_t* active_context, uint_t* mergeable_context) {
   entry_active = get_call_stack(active_context);
   entry_mergeable = get_call_stack(mergeable_context);
 
-  if (debug_merge) 
+  if (debug_merge)
     printf1("; Call stack of active context (%d):\n", (char*) active_context);
 
   while(entry_active) {
 
-    if (debug_merge) 
+    if (debug_merge)
       printf1("; %x\n", (char*) *(entry_active + 1));
 
     active_context_stack_length = active_context_stack_length + 1;
     entry_active = (uint_t*) *(entry_active + 0);
   }
 
-  if (debug_merge) 
+  if (debug_merge)
     printf1("; Call stack of mergeable context (%d):\n", (char*) mergeable_context);
 
   while(entry_mergeable) {
 
-    if (debug_merge) 
+    if (debug_merge)
       printf1("; %x\n", (char*) *(entry_mergeable + 1));
 
     mergeable_context_stack_length = mergeable_context_stack_length + 1;
@@ -10232,26 +10232,41 @@ char* replace_extension(char* filename, char* extension) {
 
   s = string_alloc(string_length(filename) + 1 + string_length(extension));
 
-  i = 0;
+  // start reading at end of filename
+  i = string_length(filename);
 
   c = load_character(filename, i);
 
-  while (c != 0) {
-    store_character(s, i, c);
+  // look for extension
+  while (c != '.') {
+    if (c == '/')
+      i = 0;
 
-    if (c == '.') {
-      store_character(s, i, 0);
-
-      c = 0;
-    } else {
-      i = i + 1;
+    if (i > 0) {
+      i = i - 1;
 
       c = load_character(filename, i);
-    }
+    } else
+      c = '.';
   }
 
-  // writing s plus extension into s
-  sprintf2(s, "%s.%s", s, extension);
+  // filename has no extension
+  if (i == 0)
+    // writing filename plus extension into s
+    sprintf2(s, "%s.%s", filename, extension);
+  else {
+    // assert: s is zeroed and thus null-terminated
+
+    // copy filename without extension and null-terminator into s
+    while (i > 0) {
+      i = i - 1;
+
+      store_character(s, i, load_character(filename, i));
+    }
+
+    // writing s plus extension into s
+    sprintf2(s, "%s.%s", s, extension);
+  }
 
   return s;
 }
