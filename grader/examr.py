@@ -49,11 +49,27 @@ class Student:
         self.q_total       = q_total
         self.q_length      = q_length
         self.q_formality   = q_formality
-        self.q_similarity  = 0
+        self.q_similarity  = float(0)
         self.a_total       = a_total
         self.a_length      = a_length
         self.a_formality   = a_formality
-        self.a_similarity  = 0
+        self.a_similarity  = float(0)
+
+def read_old_qas(responsefiles):
+    emails    = []
+    questions = []
+    answers   = []
+
+    for responsefile in responsefiles:
+        with open(responsefile, mode='r') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+
+            for row in csv_reader:
+                emails.append(row['Email address'])
+                questions.append(row['Ask Question'])
+                answers.append(row['Answer Question'])
+
+    return emails, questions, answers
 
 def read_qas(csv_file):
     csv_reader = csv.DictReader(csv_file)
@@ -124,68 +140,81 @@ def write_results(students, csv_file):
             'Answer Average': student[1].a_total / student[1].number_of_qas
         })
 
-def compute_similarity(message, strings, emails):
-    vectors = get_vectors(strings)
+def compute_similarity(message, strings, emails, old_strings, old_emails):
+    all_strings = strings + old_strings
+    all_emails  = emails + old_emails
 
-    similarity = [ [0] * len(strings) for i in range(len(strings)) ]
+    vectors = get_vectors(all_strings)
+
+    similarity = [ [float(0)] * len(all_strings) for i in range(len(strings)) ]
 
     for x in range(len(strings)):
-        for y in range(len(strings)):
+        for y in range(len(all_strings)):
             if x < y:
-                # similarity[x][y] = get_cosine_similarity(strings[x], strings[y])
+                # similarity[x][y] = get_cosine_similarity(strings[x], all_strings[y])
                 similarity[x][y] = get_lasered_cosine_similarity(vectors[x], vectors[y])
 
                 if similarity[x][y] > 0.95:
-                    print(f'{message} similarity {similarity[x][y]} at [{x},{y}]:\n{emails[x]}\n{emails[y]}\n<<<\n{strings[x]}\n---\n{strings[y]}\n>>>\n')
+                    print(f'{message} similarity {similarity[x][y]} at [{x},{y}]:\n{emails[x]}\n{all_emails[y]}{" (old)" if y>len(strings) else ""}\n<<<\n{strings[x]}\n---\n{all_strings[y]}\n>>>\n')
             elif x > y:
                 similarity[x][y] = similarity[y][x]
             else:
-                similarity[x][y] = 1
+                similarity[x][y] = 1.0
 
     return similarity
 
-def assign_similarity(students, emails, q_similarity, a_similarity):
+def assign_similarity(students, emails, old_emails, q_similarity, a_similarity):
+    all_emails = emails + old_emails
+
     for x in range(len(emails)):
         student = students[emails[x]]
 
-        for y in range(len(emails)):
+        for y in range(len(all_emails)):
             if x != y:
                 student.q_similarity += q_similarity[x][y]
                 student.a_similarity += a_similarity[x][y]
 
-        if (len(emails) > 1):
+        if (len(all_emails) > 1):
             # normalize again
-            student.q_similarity /= len(emails) - 1
-            student.a_similarity /= len(emails) - 1
+            student.q_similarity /= len(all_emails) - 1
+            student.a_similarity /= len(all_emails) - 1
 
 def main(argv):
-    inputfile = ''
-    outputfile = ''
+    oldresponsefiles = []
+    responsefile     = ''
+    analysisfile     = ''
+
     try:
-        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
+        opts, args = getopt.getopt(argv,"ho:r:a:",["ofile=","rfile=","afile="])
     except getopt.GetoptError:
-        print ('examr.py -i <inputfile> -o <outputfile>')
+        print ('examr.py { -o <oldresponsesfile> } -r <responsefile> -a <analysisfile>')
         sys.exit(2)
+
     for opt, arg in opts:
         if opt == '-h':
-            print ('examr.py -i <inputfile> -o <outputfile>')
+            print ('examr.py { -o <oldresponsesfile> } -r <responsefile> -a <analysisfile>')
             sys.exit()
-        elif opt in ("-i", "--ifile"):
-            inputfile = arg
         elif opt in ("-o", "--ofile"):
-            outputfile = arg
-    if inputfile != '':
-        with open(inputfile, mode='r') as csv_input_file:
-            if outputfile != '':
-                with open(outputfile, mode='w') as csv_output_file:
-                    students, emails, questions, answers, q_length, q_formality, a_length, a_formality = read_qas(csv_input_file)
+            oldresponsefiles.append(arg)
+        elif opt in ("-r", "--rfile"):
+            responsefile = arg
+        elif opt in ("-a", "--afile"):
+            analysisfile = arg
 
-                    q_similarity = compute_similarity("Question", questions, emails)
-                    a_similarity = compute_similarity("Answer", answers, emails)
+    if responsefile != '':
+        with open(responsefile, mode='r') as csv_responses_file:
+            if analysisfile != '':
+                with open(analysisfile, mode='w') as csv_analysis_file:
+                    old_emails, old_questions, old_answers = read_old_qas(oldresponsefiles)
 
-                    assign_similarity(students, emails, q_similarity, a_similarity)
+                    students, emails, questions, answers, q_length, q_formality, a_length, a_formality = read_qas(csv_responses_file)
 
-                    write_results(students, csv_output_file)
+                    q_similarity = compute_similarity("Question", questions, emails, old_questions, old_emails)
+                    a_similarity = compute_similarity("Answer", answers, emails, old_answers, old_emails)
+
+                    assign_similarity(students, emails, old_emails, q_similarity, a_similarity)
+
+                    write_results(students, csv_analysis_file)
 
                     print(f'Number of students: {len(students)}')
                     print(f'Total number of Q&As {len(questions)}')
